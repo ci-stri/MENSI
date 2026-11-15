@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MENSI</title>
+  <meta name="theme-color" content="#FBF4E4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MENSI">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="css/mensi.css">
+</head>
+<body>
+  <main class="spalte">
+    <header class="kopf">
+      <button class="rund" id="tag-zurueck" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="datum"><small id="datum-klein">Heute</small><strong id="datum-gross"></strong></div>
+      <button class="rund" id="tag-vor" aria-label="Nächster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </header>
+    <p class="status" id="status" aria-live="polite"></p>
+
+    <section class="karte gelb" aria-labelledby="t-schmerz">
+      <div class="zeile">
+        <h2 id="t-schmerz">Wie stark war<br>der Schmerz?</h2>
+        <span class="wert" id="schmerz-wert" aria-live="polite">–</span>
+      </div>
+      <div class="skala" id="skala" role="group" aria-label="Schmerzstärke 1 bis 10"></div>
+      <button class="breit" id="schmerzfrei" aria-pressed="false">Schmerzfrei</button>
+      <p>Ein Tap für eine Stärke, ein zweiter Tap für eine Spanne, zum Beispiel 3 und dann 7.</p>
+    </section>
+
+    <section class="karte hell" id="schmerz-details" aria-labelledby="t-zeit">
+      <h3 id="t-zeit">Wann war es am stärksten?</h3>
+      <div class="pillen gleich" id="tageszeiten" role="group" aria-labelledby="t-zeit">
+        <button data-zeit="morgens">Morgens</button>
+        <button data-zeit="mittags">Mittags</button>
+        <button data-zeit="abends">Abends</button>
+        <button data-zeit="nachts">Nachts</button>
+      </div>
+      <div class="zeile mitte">
+        <h3>Dauer insgesamt</h3>
+        <div class="zaehler">
+          <button class="rund" id="dauer-minus" aria-label="Eine Stunde weniger">−</button>
+          <output id="dauer">offen</output>
+          <button class="rund" id="dauer-plus" aria-label="Eine Stunde mehr">+</button>
+        </div>
+      </div>
+      <details id="ort-karte">
+        <summary>Schmerzort <span id="ort-text">optional</span></summary>
+        <div class="koerper">
+          <figure><svg id="koerper-vorne" viewBox="0 0 120 260" role="group" aria-label="Körper von vorne"></svg><figcaption>Vorderseite</figcaption></figure>
+          <figure><svg id="koerper-hinten" viewBox="0 0 120 260" role="group" aria-label="Körper von hinten"></svg><figcaption>Rückseite</figcaption></figure>
+        </div>
+      </details>
+    </section>
+    <section class="karte salbei" aria-labelledby="t-medis">
+      <div class="zeile mitte">
+        <h2 id="t-medis">Medikamente</h2>
+        <button class="bearb" id="medi-edit" aria-pressed="false">Bearbeiten</button>
+      </div>
+
+      <h3 class="unter">Täglich</h3>
+      <div class="liste" id="taeglich"></div>
+      <div class="feld" id="taeglich-neu" hidden>
+        <h3>Tägliches Medikament hinzufügen</h3>
+        <div class="pillen" id="vorlagen-taeglich"></div>
+        <input type="text" id="neu-name" placeholder="Name und Dosis" aria-label="Name und Dosis" autocomplete="off">
+        <label class="zeile mitte">Uhrzeit der Einnahme <input type="time" id="neu-zeit" value="08:00"></label>
+        <label class="haekchen"><input type="checkbox" id="neu-wecker" checked> An die Einnahme erinnern</label>
+        <button class="breit dunkel" id="neu-ok">Hinzufügen</button>
+        <button class="breit" id="kalender-ok">Erinnerungen in den Kalender übernehmen</button>
+        <p>Legt pro Uhrzeit einen täglichen Termin mit Alarm an. Nach Änderungen am Plan erneut übernehmen; entfernte Uhrzeiten bitte im Kalender von Hand löschen.</p>
+      </div>
+
+      <h3 class="unter" id="spontan-titel">Heute zusätzlich</h3>
+      <div class="liste" id="spontan"></div>
+      <p id="spontan-leer">Noch nichts eingetragen.</p>
+      <button class="breit" id="spontan-auf" aria-expanded="false">+ Einzelne Einnahme</button>
+      <div class="feld" id="spontan-neu" hidden>
+        <div class="pillen" id="vorlagen-spontan"></div>
+        <div class="reihe">
+          <input type="text" id="sp-name" placeholder="Anderes: Name und Dosis" aria-label="Anderes Medikament, Name und Dosis" autocomplete="off">
+          <button class="bearb" id="sp-ok">Eintragen</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

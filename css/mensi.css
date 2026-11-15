@@ -1,0 +1,118 @@
+/* MENSI: eine Telefonspalte, farbige Karten je Thema. Nur helles Erscheinungsbild. */
+:root {
+  color-scheme: light;
+  --creme: #FBF4E4;
+  --tinte: #16130F;
+  --tinte-weich: #5B544A;
+  --weiss: #FFFDF8;
+  --gelb: #F7DB6A;
+  --rosa: #F5B5DA;
+  --salbei: #B4C27E;
+  --blau: #BCCBEE;
+  --beere: #B8328F;
+  --schrift-gross: "Avenir Next", "Avenir", "Segoe UI", system-ui, sans-serif;
+  --schrift-text: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --radius-karte: 28px;
+}
+* { box-sizing: border-box; }
+html { background: var(--creme); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--creme);
+  color: var(--tinte);
+  font-family: var(--schrift-text);
+  font-size: 16px;
+  line-height: 1.4;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+[hidden] { display: none !important; }
+.spalte { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+button:disabled { opacity: .35; cursor: default; }
+button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--beere); outline-offset: 2px; }
+
+/* Kopf */
+.kopf { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 6px 0; }
+.rund { width: 44px; height: 44px; border-radius: 50%; background: var(--weiss); display: grid; place-items: center; flex: none; }
+.rund svg { width: 20px; height: 20px; }
+.datum { text-align: center; min-width: 0; }
+.datum small { display: block; font-size: 13px; color: var(--tinte-weich); }
+.datum strong { font-family: var(--schrift-gross); font-weight: 500; font-size: 20px; }
+.status { margin: -8px 0 -6px; min-height: 18px; font-size: 13px; color: var(--tinte-weich); text-align: center; }
+
+/* Karten */
+.karte { border-radius: var(--radius-karte); padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+.karte h2 { font-family: var(--schrift-gross); font-weight: 500; font-size: 24px; line-height: 1.1; margin: 0; text-wrap: balance; }
+.karte h3 { font-family: var(--schrift-gross); font-weight: 500; font-size: 17px; margin: 0; }
+.karte p { margin: 0; font-size: 14px; }
+.gelb { background: var(--gelb); }
+.rosa { background: var(--rosa); }
+.salbei { background: var(--salbei); }
+.blau { background: var(--blau); }
+.hell { background: var(--weiss); }
+.zeile { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.zeile.mitte { align-items: center; }
+.wert { font-family: var(--schrift-gross); font-size: 40px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Skala */
+.skala { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.skala button { aspect-ratio: 1; border-radius: 50%; background: var(--weiss); font-family: var(--schrift-gross); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; transition: background .15s, color .15s; }
+.skala button.an { background: var(--tinte); color: var(--creme); }
+.skala button.rand { background: var(--beere); color: var(--weiss); }
+.breit { border-radius: 999px; background: var(--weiss); padding: 14px 18px; font-weight: 600; text-align: center; }
+.breit.an, .breit.dunkel { background: var(--tinte); color: var(--creme); }
+
+/* Auswahl-Pillen */
+.pillen { display: flex; flex-wrap: wrap; gap: 8px; }
+.pillen button { border-radius: 999px; background: var(--creme); padding: 11px 16px; font-weight: 500; min-height: 44px; transition: background .15s, color .15s; }
+.pillen button.an { background: var(--tinte); color: var(--creme); }
+.gleich { display: grid; grid-template-columns: repeat(4, 1fr); }
+.gleich button { padding-inline: 4px; }
+
+/* Dauer */
+.zaehler { display: flex; align-items: center; gap: 10px; }
+.zaehler .rund { font-size: 24px; font-family: var(--schrift-gross); background: var(--creme); }
+.zaehler output { font-family: var(--schrift-gross); font-size: 20px; font-weight: 500; min-width: 6ch; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Schmerzort */
+details summary { font-family: var(--schrift-gross); font-weight: 500; font-size: 17px; cursor: pointer; padding-block: 6px; }
+details summary span { font-family: var(--schrift-text); font-weight: 400; font-size: 14px; color: var(--tinte-weich); margin-left: 6px; }
+.koerper { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.koerper figure { margin: 0; text-align: center; }
+.koerper figcaption { font-size: 13px; color: var(--tinte-weich); }
+.koerper svg { width: 100%; max-width: 160px; height: auto; }
+.koerper .stumm { fill: var(--creme); }
+.koerper .region { fill: var(--blau); stroke: var(--weiss); stroke-width: 2; cursor: pointer; transition: fill .15s; }
+.koerper .region.an { fill: var(--beere); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Medikamente */
+.karte h3.unter { font-family: var(--schrift-text); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+.bearb { border-radius: 999px; background: var(--tinte); color: var(--creme); padding: 8px 16px; font-weight: 600; font-size: 14px; min-height: 40px; flex: none; }
+.bearb.an { background: var(--beere); color: var(--weiss); }
+.liste { display: flex; flex-direction: column; gap: 8px; }
+.liste:empty { display: none; }
+.zeit-kopf { display: flex; align-items: center; gap: 8px; font-family: var(--schrift-gross); font-weight: 500; font-size: 16px; font-variant-numeric: tabular-nums; margin-top: 4px; }
+.zeit-kopf svg { width: 16px; height: 16px; display: block; }
+.zeit-kopf small { font-family: var(--schrift-text); font-weight: 400; font-size: 13px; }
+.eintrag { display: flex; align-items: center; gap: 8px; }
+.haupt { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; background: color-mix(in srgb, var(--weiss) 55%, transparent); border-radius: 999px; padding: 8px 16px 8px 8px; min-height: 52px; }
+.haupt .haken { width: 36px; height: 36px; border-radius: 50%; background: var(--weiss); display: grid; place-items: center; flex: none; }
+.haupt .haken svg { width: 18px; height: 18px; opacity: 0; }
+.haupt.an { background: var(--weiss); }
+.haupt.an .haken { background: var(--tinte); color: var(--creme); }
+.haupt.an .haken svg { opacity: 1; }
+.haupt .text { min-width: 0; overflow-wrap: anywhere; }
+.haupt small { display: block; font-size: 13px; color: var(--tinte-weich); }
+.weg { width: 44px; height: 44px; border-radius: 50%; background: var(--beere); color: var(--weiss); font-size: 22px; flex: none; line-height: 1; }
+.feld { background: color-mix(in srgb, var(--weiss) 60%, transparent); border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.feld .pillen button { background: var(--weiss); }
+input[type="text"], input[type="time"] { font: inherit; color: var(--tinte); background: var(--weiss); border: 0; border-radius: 14px; padding: 12px 14px; min-height: 44px; min-width: 0; }
+input[type="text"] { width: 100%; }
+input:focus-visible { outline: 3px solid var(--beere); outline-offset: 2px; }
+label.zeile, label.haekchen { font-size: 15px; }
+label.haekchen { display: flex; align-items: center; gap: 10px; }
+label.haekchen input { width: 22px; height: 22px; accent-color: var(--tinte); }
+.reihe { display: flex; gap: 8px; align-items: center; }
+.reihe input { flex: 1; }
