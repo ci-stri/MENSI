@@ -6,34 +6,51 @@ import {
 
 const SVG = 'http://www.w3.org/2000/svg';
 
-// Regionen des Körperschaubilds. „rechts"/„links" meint die Körperseite der Person.
+// Körperschaubild: eine Figur als Umriss, darin farbige Felder mit geschwungenen Grenzen.
+// Der Umriss schneidet die Felder zu. „rechts"/„links" meint die Körperseite der Person.
+const KOPF = ['ellipse', { cx: 70, cy: 22, rx: 13, ry: 16 }];
+// Rechte Bildhälfte der Figur (Hals, Schulter, Arm mit Hand, Rumpf, Bein mit Fuß); gespiegelt ergibt sie die linke.
+const HAELFTE = 'M69.5,32 L76,32 L76,42 C76,47 84,49 94,51 C101,52 105,57 106,65 C108,82 110,98 112,114 '
+  + 'C114,128 116,140 117,152 C118,160 120,166 119,172 C118,177 112,177 110,172 C109,166 108,160 107,152 '
+  + 'C105,138 102,126 100,114 C98,100 96,86 95,74 C95,88 90,100 89,112 C88,126 96,138 98,152 '
+  + 'C100,172 95,200 91,220 C93,236 92,256 85,280 L89,290 C90,294 87,295 83,295 L77,295 C75,290 76,285 76,280 '
+  + 'C77,258 76,238 74,220 C74,200 72,178 70,162 L69.5,162 Z';
+const UMRISS = [
+  KOPF,
+  ['path', { d: HAELFTE }],
+  ['path', { d: HAELFTE, transform: 'matrix(-1 0 0 1 140 0)' }],
+];
+// Feld zwischen zwei Bögen: oben bei y1, unten bei y2; b1/b2 = wie weit sich der Bogen in der Mitte nach unten wölbt.
+function feld(y1, b1, y2, b2, x1 = 43, x2 = 97) {
+  const m = (x1 + x2) / 2;
+  return ['path', { d: `M${x1},${y1} Q${m},${y1 + 2 * b1} ${x2},${y1} L${x2},${y2} Q${m},${y2 + 2 * b2} ${x1},${y2} Z` }];
+}
+const UNTERBAUCH = feld(112, 3, 147, 9);
 const REGIONEN = {
   vorne: [
-    { id: 'kopf', name: 'Kopf', formen: [['circle', { cx: 60, cy: 22, r: 16 }]] },
-    { id: 'brust', name: 'Brust', formen: [['rect', { x: 34, y: 44, width: 52, height: 40, rx: 14 }]] },
-    { id: 'oberbauch', name: 'Oberbauch', formen: [['rect', { x: 36, y: 86, width: 48, height: 26, rx: 8 }]] },
-    { id: 'unterbauch-rechts', name: 'Unterbauch rechts', formen: [['rect', { x: 36, y: 114, width: 15, height: 28, rx: 6 }]] },
-    { id: 'unterbauch-mitte', name: 'Unterbauch Mitte', formen: [['rect', { x: 52, y: 114, width: 16, height: 28, rx: 6 }]] },
-    { id: 'unterbauch-links', name: 'Unterbauch links', formen: [['rect', { x: 69, y: 114, width: 15, height: 28, rx: 6 }]] },
-    { id: 'leiste', name: 'Leiste / Becken', formen: [['rect', { x: 36, y: 144, width: 48, height: 18, rx: 8 }]] },
-    { id: 'oberschenkel-vorne', name: 'Oberschenkel vorne', formen: [['rect', { x: 36, y: 164, width: 22, height: 50, rx: 10 }], ['rect', { x: 62, y: 164, width: 22, height: 50, rx: 10 }]] },
+    { id: 'kopf', name: 'Kopf', farbe: 'salbei', formen: [feld(0, 0, 44, 0)] },
+    { id: 'brust', name: 'Brust', farbe: 'blau', formen: [feld(44, 0, 88, -5)] },
+    { id: 'oberbauch', name: 'Oberbauch', farbe: 'gelb', formen: [feld(88, -5, 112, 3)] },
+    { id: 'unterbauch-rechts', name: 'Unterbauch rechts', farbe: 'rosa', teil: [0, 62] },
+    { id: 'unterbauch-mitte', name: 'Unterbauch Mitte', farbe: 'rosa-hell', teil: [62, 78] },
+    { id: 'unterbauch-links', name: 'Unterbauch links', farbe: 'rosa', teil: [78, 140] },
+    { id: 'leiste', name: 'Leiste / Becken', farbe: 'salbei', formen: [feld(147, 9, 168, 3, 38, 102)] },
+    { id: 'oberschenkel-vorne', name: 'Oberschenkel vorne', farbe: 'blau', formen: [feld(168, 3, 212, 0, 38, 102)] },
+    { id: 'knie', name: 'Knie', farbe: 'gelb', formen: [feld(212, 0, 234, 0, 38, 102)] },
+    { id: 'unterschenkel-vorne', name: 'Unterschenkel vorne', farbe: 'salbei', formen: [feld(234, 0, 281, 0, 38, 102)] },
   ],
   hinten: [
-    { id: 'nacken', name: 'Hinterkopf / Nacken', formen: [['circle', { cx: 60, cy: 22, r: 16 }]] },
-    { id: 'ruecken-oben', name: 'Oberer Rücken', formen: [['rect', { x: 34, y: 44, width: 52, height: 40, rx: 14 }]] },
-    { id: 'ruecken-mitte', name: 'Mittlerer Rücken', formen: [['rect', { x: 36, y: 86, width: 48, height: 26, rx: 8 }]] },
-    { id: 'ruecken-unten', name: 'Unterer Rücken', formen: [['rect', { x: 36, y: 114, width: 48, height: 28, rx: 8 }]] },
-    { id: 'gesaess', name: 'Gesäß', formen: [['rect', { x: 36, y: 144, width: 48, height: 18, rx: 8 }]] },
-    { id: 'kreuzbein', name: 'Kreuzbein / Steiß', formen: [['rect', { x: 51, y: 140, width: 18, height: 18, rx: 7 }]] },
-    { id: 'oberschenkel-hinten', name: 'Oberschenkel hinten', formen: [['rect', { x: 36, y: 164, width: 22, height: 50, rx: 10 }], ['rect', { x: 62, y: 164, width: 22, height: 50, rx: 10 }]] },
+    { id: 'nacken', name: 'Hinterkopf / Nacken', farbe: 'salbei', formen: [feld(0, 0, 48, 2)] },
+    { id: 'ruecken-oben', name: 'Oberer Rücken', farbe: 'blau', formen: [feld(48, 2, 88, 3)] },
+    { id: 'ruecken-mitte', name: 'Mittlerer Rücken', farbe: 'gelb', formen: [feld(88, 3, 112, 3)] },
+    { id: 'ruecken-unten', name: 'Unterer Rücken', farbe: 'rosa', formen: [feld(112, 3, 136, -3)] },
+    { id: 'gesaess', name: 'Gesäß', farbe: 'salbei', formen: [feld(136, -3, 172, 4, 38, 102)] },
+    { id: 'kreuzbein', name: 'Kreuzbein / Steiß', farbe: 'rosa-hell', formen: [['path', { d: 'M59,128 Q70,122 81,128 Q80,146 70,154 Q60,146 59,128 Z' }]] },
+    { id: 'oberschenkel-hinten', name: 'Oberschenkel hinten', farbe: 'blau', formen: [feld(172, 4, 214, 0, 38, 102)] },
+    { id: 'kniekehle', name: 'Kniekehle', farbe: 'gelb', formen: [feld(214, 0, 234, 0, 38, 102)] },
+    { id: 'wade', name: 'Wade', farbe: 'salbei', formen: [feld(234, 0, 281, 0, 38, 102)] },
   ],
 };
-const STUMM = [
-  ['rect', { x: 18, y: 46, width: 12, height: 72, rx: 6 }],
-  ['rect', { x: 90, y: 46, width: 12, height: 72, rx: 6 }],
-  ['rect', { x: 38, y: 216, width: 18, height: 40, rx: 8 }],
-  ['rect', { x: 64, y: 216, width: 18, height: 40, rx: 8 }],
-];
 const NAMEN = Object.fromEntries([...REGIONEN.vorne, ...REGIONEN.hinten].map((r) => [r.id, r.name]));
 
 function form([tag, attribute], klasse) {
@@ -58,15 +75,42 @@ export function initSchmerz(speichern) {
 
   for (const [seite, svgId] of [['vorne', 'koerper-vorne'], ['hinten', 'koerper-hinten']]) {
     const svg = $(svgId);
-    STUMM.forEach((f) => svg.appendChild(form(f, 'stumm')));
+    const schnitt = (id, formen) => {
+      const c = document.createElementNS(SVG, 'clipPath');
+      c.id = id;
+      formen.forEach((f) => c.appendChild(form(f, '')));
+      svg.appendChild(c);
+    };
+    schnitt(`umriss-${seite}`, UMRISS);
+    UMRISS.forEach((f) => svg.appendChild(form(f, 'stumm')));
     for (const region of REGIONEN[seite]) {
       const g = document.createElementNS(SVG, 'g');
       g.dataset.ort = region.id;
+      g.setAttribute('clip-path', `url(#umriss-${seite})`);
       g.setAttribute('role', 'button');
       g.setAttribute('tabindex', '0');
       g.setAttribute('aria-label', region.name);
-      region.formen.forEach((f) => g.appendChild(form(f, 'region')));
+      g.style.setProperty('--f', `var(--${region.farbe})`);
+      if (region.teil) {
+        // Drittel des Unterbauchs: derselbe Bogen, seitlich beschnitten.
+        const [xa, xb] = region.teil;
+        schnitt(`teil-${region.id}`, [['rect', { x: xa, y: 0, width: xb - xa, height: 300 }]]);
+        const innen = document.createElementNS(SVG, 'g');
+        innen.setAttribute('clip-path', `url(#teil-${region.id})`);
+        innen.appendChild(form(UNTERBAUCH, 'region'));
+        g.appendChild(innen);
+      } else {
+        region.formen.forEach((f) => g.appendChild(form(f, 'region')));
+      }
       svg.appendChild(g);
+    }
+    if (seite === 'vorne') {
+      // Trennlinien zwischen den Dritteln des Unterbauchs.
+      schnitt('unterbauch-form', [UNTERBAUCH]);
+      const naehte = document.createElementNS(SVG, 'g');
+      naehte.setAttribute('clip-path', 'url(#unterbauch-form)');
+      for (const x of [62, 78]) naehte.appendChild(form(['line', { x1: x, y1: 100, x2: x, y2: 170 }], 'naht'));
+      svg.appendChild(naehte);
     }
   }
 
@@ -91,7 +135,7 @@ export function initSchmerz(speichern) {
     for (const g of document.querySelectorAll('[data-ort]')) {
       const an = s.orte.includes(g.dataset.ort);
       g.setAttribute('aria-pressed', an);
-      for (const f of g.children) f.classList.toggle('an', an);
+      for (const f of g.querySelectorAll('.region')) f.classList.toggle('an', an);
     }
     $('ort-text').textContent = s.orte.length ? s.orte.map((o) => NAMEN[o] || o).join(', ') : 'optional';
   }

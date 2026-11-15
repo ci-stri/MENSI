@@ -7,6 +7,7 @@
   --weiss: #FFFDF8;
   --gelb: #F7DB6A;
   --rosa: #F5B5DA;
+  --rosa-hell: #FAD6EA;
   --salbei: #B4C27E;
   --blau: #BCCBEE;
   --beere: #B8328F;
@@ -80,10 +81,13 @@ details summary span { font-family: var(--schrift-text); font-weight: 400; font-
 .koerper { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
 .koerper figure { margin: 0; text-align: center; }
 .koerper figcaption { font-size: 13px; color: var(--tinte-weich); }
-.koerper svg { width: 100%; max-width: 160px; height: auto; }
+.koerper svg { width: 100%; max-width: 170px; height: auto; }
 .koerper .stumm { fill: var(--creme); }
-.koerper .region { fill: var(--blau); stroke: var(--weiss); stroke-width: 2; cursor: pointer; transition: fill .15s; }
+.koerper .region { fill: var(--f, var(--blau)); stroke: var(--weiss); stroke-width: 1.5; cursor: pointer; transition: fill .15s; }
+.koerper .naht { stroke: var(--weiss); stroke-width: 1.5; pointer-events: none; }
 .koerper .region.an { fill: var(--beere); }
+.koerper g:focus { outline: none; }
+.koerper g:focus-visible .region { stroke: var(--tinte); stroke-width: 3; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
@@ -116,3 +120,10 @@ label.haekchen { display: flex; align-items: center; gap: 10px; }
 label.haekchen input { width: 22px; height: 22px; accent-color: var(--tinte); }
 .reihe { display: flex; gap: 8px; align-items: center; }
 .reihe input { flex: 1; }
+input.unterzeile { margin: -2px 0 4px 20px; width: calc(100% - 20px); font-size: 15px; min-height: 40px; padding-block: 8px; }
+.pillen .paar { display: flex; border-radius: 999px; background: var(--weiss); min-width: 0; }
+.pillen .paar button { background: none; }
+.pillen .paar button:first-child { padding-right: 6px; min-width: 0; overflow-wrap: anywhere; text-align: left; }
+.pillen .paar .stern { padding: 0 12px 0 6px; display: grid; place-items: center; flex: none; }
+.pillen .stern svg { width: 20px; height: 20px; fill: none; color: var(--tinte-weich); }
+.pillen .favorit .stern svg { fill: var(--beere); color: var(--beere); }

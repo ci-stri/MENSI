@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aktivAm, gruppiereNachZeit, mitVorlage } from '../js/logik.js';
+import { aktivAm, gruppiereNachZeit, mitVorlage, favoritenZuerst } from '../js/logik.js';
 import { erinnerungsKalender } from '../js/kalender.js';
 
 const medis = [
@@ -42,4 +42,11 @@ test('Kalender: ein Termin pro Uhrzeit, nur für Medikamente mit Erinnerung', ()
   assert.ok(ics.includes('DTSTAMP:20261114T120000Z'));
   assert.ok(!ics.includes('Eisen'));
   assert.ok(ics.startsWith('BEGIN:VCALENDAR\r\n') && ics.endsWith('END:VCALENDAR\r\n'));
+});
+
+test('Favoriten stehen oben, der Rest behält seine Reihenfolge', () => {
+  const v = ['Ibuprofen 200 mg', 'Ibuprofen 400 mg', 'Paracetamol 500 mg', 'Buscopan'];
+  assert.deepEqual(favoritenZuerst(v, ['Buscopan', 'Ibuprofen 400 mg']),
+    ['Ibuprofen 400 mg', 'Buscopan', 'Ibuprofen 200 mg', 'Paracetamol 500 mg']);
+  assert.deepEqual(favoritenZuerst(v, []), v);
 });

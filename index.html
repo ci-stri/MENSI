@@ -51,8 +51,8 @@
       <details id="ort-karte">
         <summary>Schmerzort <span id="ort-text">optional</span></summary>
         <div class="koerper">
-          <figure><svg id="koerper-vorne" viewBox="0 0 120 260" role="group" aria-label="Körper von vorne"></svg><figcaption>Vorderseite</figcaption></figure>
-          <figure><svg id="koerper-hinten" viewBox="0 0 120 260" role="group" aria-label="Körper von hinten"></svg><figcaption>Rückseite</figcaption></figure>
+          <figure><svg id="koerper-vorne" viewBox="18 0 104 300" role="group" aria-label="Körper von vorne"></svg><figcaption>Vorderseite</figcaption></figure>
+          <figure><svg id="koerper-hinten" viewBox="18 0 104 300" role="group" aria-label="Körper von hinten"></svg><figcaption>Rückseite</figcaption></figure>
         </div>
       </details>
     </section>
@@ -68,6 +68,7 @@
         <h3>Tägliches Medikament hinzufügen</h3>
         <div class="pillen" id="vorlagen-taeglich"></div>
         <input type="text" id="neu-name" placeholder="Name und Dosis" aria-label="Name und Dosis" autocomplete="off">
+        <input type="text" id="neu-notiz" placeholder="Notiz (optional), z. B. nach dem Essen" aria-label="Notiz zum Medikament" autocomplete="off">
         <label class="zeile mitte">Uhrzeit der Einnahme <input type="time" id="neu-zeit" value="08:00"></label>
         <label class="haekchen"><input type="checkbox" id="neu-wecker" checked> An die Einnahme erinnern</label>
         <button class="breit dunkel" id="neu-ok">Hinzufügen</button>

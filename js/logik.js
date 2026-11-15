@@ -90,3 +90,9 @@ export function mitVorlage(vorlagen, name) {
   const gesucht = name.trim().toLowerCase();
   return vorlagen.some((v) => v.toLowerCase() === gesucht) ? vorlagen : [...vorlagen, name.trim()];
 }
+
+// Favoriten zuerst, sonst bleibt die Reihenfolge erhalten.
+export function favoritenZuerst(vorlagen, favoriten) {
+  const istFavorit = (v) => favoriten.includes(v);
+  return [...vorlagen.filter(istFavorit), ...vorlagen.filter((v) => !istFavorit(v))];
+}

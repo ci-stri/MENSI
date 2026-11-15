@@ -1,6 +1,6 @@
 // Offline-Betrieb: Netz zuerst (damit Updates sofort ankommen), sonst aus dem Zwischenspeicher.
 // Neue Dateien der App hier eintragen und VERSION erhöhen.
-const VERSION = 'mensi-2';
+const VERSION = 'mensi-6';
 const DATEIEN = [
   './',
   'index.html',

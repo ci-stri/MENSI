@@ -1,10 +1,11 @@
 // Medikamente: tägliche Checkliste (nach Uhrzeit gruppiert) und zusätzliche Einnahmen des Tages.
 // Einnahmen liegen im Tagesdokument (tag.einnahmen), tägliche Medikamente im Speicher „medikamente".
 import { alle, lege, ladeEinstellung, speichereEinstellung } from '../db.js';
-import { aktivAm, gruppiereNachZeit, mitVorlage, tagesSchluessel, STANDARD_VORLAGEN } from '../logik.js';
+import { aktivAm, gruppiereNachZeit, mitVorlage, favoritenZuerst, schalteInListe, tagesSchluessel, STANDARD_VORLAGEN } from '../logik.js';
 import { erinnerungsKalender } from '../kalender.js';
 
 const HAKEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+const STERN = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z"/></svg>';
 const GLOCKE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg>';
 
 function el(tag, klasse, text) {
@@ -19,6 +20,7 @@ export function initMedikamente(speichern, melde) {
   let tag = { datum: '' };
   let medikamente = [];
   let vorlagen = [...STANDARD_VORLAGEN];
+  let favoriten = [];
   let bearbeiten = false;
   let offen = null; // id der aufgeklappten zusätzlichen Einnahme
 
@@ -73,7 +75,7 @@ export function initMedikamente(speichern, melde) {
       for (const m of gruppe.medikamente) {
         const genommen = einnahmen().some((e) => e.medId === m.id);
         const zeile = el('div', 'eintrag');
-        const knopf = hauptKnopf(m.name, undefined, genommen);
+        const knopf = hauptKnopf(m.name, m.notiz || undefined, genommen);
         knopf.setAttribute('aria-pressed', genommen);
         knopf.addEventListener('click', () => {
           setzeEinnahmen(genommen
@@ -92,6 +94,22 @@ export function initMedikamente(speichern, melde) {
           zeile.appendChild(weg);
         }
         box.appendChild(zeile);
+        if (bearbeiten) {
+          const notiz = el('input', 'unterzeile');
+          notiz.type = 'text';
+          notiz.placeholder = 'Notiz, z. B. nach dem Essen';
+          notiz.setAttribute('aria-label', `Notiz zu ${m.name}`);
+          notiz.value = m.notiz || '';
+          notiz.addEventListener('change', () => sicher(async () => {
+            m.notiz = notiz.value.trim();
+            await lege('medikamente', m);
+            const text = knopf.querySelector('.text');
+            text.textContent = m.name;
+            if (m.notiz) text.appendChild(el('small', '', m.notiz));
+            melde('Gespeichert');
+          }));
+          box.appendChild(notiz);
+        }
       }
     }
     if (!aktive.length) box.appendChild(el('p', '', 'Noch keine täglichen Medikamente. Über „Bearbeiten" anlegen.'));
@@ -138,13 +156,27 @@ export function initMedikamente(speichern, melde) {
     const spontan = $('vorlagen-spontan');
     taeglich.textContent = '';
     spontan.textContent = '';
-    for (const name of vorlagen) {
+    for (const name of favoritenZuerst(vorlagen, favoriten)) {
       const a = el('button', '', name);
       a.addEventListener('click', () => { $('neu-name').value = name; });
       taeglich.appendChild(a);
+
+      // Zusätzliche Einnahme: Name trägt ein, Stern merkt als Favorit (Favoriten stehen oben).
+      const istFavorit = favoriten.includes(name);
+      const paar = el('span', `paar${istFavorit ? ' favorit' : ''}`);
       const b = el('button', '', name);
       b.addEventListener('click', () => trageSpontanEin(name));
-      spontan.appendChild(b);
+      const stern = el('button', 'stern');
+      stern.innerHTML = STERN;
+      stern.setAttribute('aria-pressed', istFavorit);
+      stern.setAttribute('aria-label', `${name} als Favorit ${istFavorit ? 'entfernen' : 'merken'}`);
+      stern.addEventListener('click', () => {
+        favoriten = schalteInListe(favoriten, name);
+        zeichneVorlagen();
+        sicher(() => speichereEinstellung('favoriten', favoriten));
+      });
+      paar.append(b, stern);
+      spontan.appendChild(paar);
     }
   }
 
@@ -170,12 +202,13 @@ export function initMedikamente(speichern, melde) {
     if (!name) { $('neu-name').focus(); return; }
     const neu = {
       id: crypto.randomUUID(), name, zeit: $('neu-zeit').value || '08:00',
-      erinnern: $('neu-wecker').checked, von: tag.datum, bis: null,
+      erinnern: $('neu-wecker').checked, notiz: $('neu-notiz').value.trim(), von: tag.datum, bis: null,
     };
     await lege('medikamente', neu);
     medikamente.push(neu);
     merkeVorlage(name);
     $('neu-name').value = '';
+    $('neu-notiz').value = '';
     zeichne();
   }));
 
@@ -223,6 +256,7 @@ export function initMedikamente(speichern, melde) {
       try {
         medikamente = await alle('medikamente');
         vorlagen = (await ladeEinstellung('vorlagen')) || [...STANDARD_VORLAGEN];
+        favoriten = (await ladeEinstellung('favoriten')) || [];
       } catch (fehler) {
         console.error(fehler);
         melde('Medikamente konnten nicht geladen werden.', true);
