@@ -21,6 +21,7 @@ export function initMedikamente(speichern, melde) {
   let medikamente = [];
   let vorlagen = [...STANDARD_VORLAGEN];
   let favoriten = [];
+  let vorlagenNotizen = {}; // Name → Notiz, erscheint im Knopf und wird bei der Einnahme mit eingetragen
   let bearbeiten = false;
   let offen = null; // id der aufgeklappten zusätzlichen Einnahme
 
@@ -95,6 +96,7 @@ export function initMedikamente(speichern, melde) {
         }
         box.appendChild(zeile);
         if (bearbeiten) {
+          // Die Notiz steht sonst als Text unter dem Namen; hier lässt sie sich ändern. Sie gilt an allen Tagen.
           const notiz = el('input', 'unterzeile');
           notiz.type = 'text';
           notiz.placeholder = 'Notiz, z. B. nach dem Essen';
@@ -141,7 +143,15 @@ export function initMedikamente(speichern, melde) {
       notiz.placeholder = 'Notiz (optional)';
       notiz.setAttribute('aria-label', `Notiz zu ${e.name}`);
       notiz.value = e.notiz || '';
-      notiz.addEventListener('change', () => { e.notiz = notiz.value.trim(); setzeEinnahmen([...einnahmen()]); });
+      notiz.addEventListener('change', () => {
+        e.notiz = notiz.value.trim();
+        // Die Notiz wandert auch in den Knopf des Medikaments und gilt für künftige Einnahmen.
+        if (vorlagen.includes(e.name)) {
+          vorlagenNotizen = { ...vorlagenNotizen, [e.name]: e.notiz };
+          sicher(() => speichereEinstellung('vorlagenNotizen', vorlagenNotizen));
+        }
+        setzeEinnahmen([...einnahmen()]);
+      });
       const weg = el('button', 'breit', 'Einnahme entfernen');
       weg.addEventListener('click', () => { offen = null; setzeEinnahmen(einnahmen().filter((x) => x.id !== e.id)); });
       feld.append(zeitZeile, notiz, weg);
@@ -158,23 +168,41 @@ export function initMedikamente(speichern, melde) {
     spontan.textContent = '';
     for (const name of favoritenZuerst(vorlagen, favoriten)) {
       const a = el('button', '', name);
-      a.addEventListener('click', () => { $('neu-name').value = name; });
+      if (vorlagenNotizen[name]) a.appendChild(el('small', '', vorlagenNotizen[name]));
+      a.addEventListener('click', () => { $('neu-name').value = name; $('neu-notiz').value = vorlagenNotizen[name] || ''; });
       taeglich.appendChild(a);
 
       // Zusätzliche Einnahme: Name trägt ein, Stern merkt als Favorit (Favoriten stehen oben).
       const istFavorit = favoriten.includes(name);
       const paar = el('span', `paar${istFavorit ? ' favorit' : ''}`);
-      const b = el('button', '', name);
+      const b = el('button', 'name', name);
+      if (vorlagenNotizen[name]) b.appendChild(el('small', '', vorlagenNotizen[name]));
       b.addEventListener('click', () => trageSpontanEin(name));
       const stern = el('button', 'stern');
-      stern.innerHTML = STERN;
-      stern.setAttribute('aria-pressed', istFavorit);
-      stern.setAttribute('aria-label', `${name} als Favorit ${istFavorit ? 'entfernen' : 'merken'}`);
-      stern.addEventListener('click', () => {
-        favoriten = schalteInListe(favoriten, name);
-        zeichneVorlagen();
-        sicher(() => speichereEinstellung('favoriten', favoriten));
-      });
+      if (bearbeiten) {
+        // Im Bearbeiten-Modus löscht das × das Medikament aus der Liste.
+        stern.textContent = '×';
+        stern.classList.add('loeschen');
+        stern.setAttribute('aria-label', `${name} aus der Liste löschen`);
+        stern.addEventListener('click', () => {
+          vorlagen = vorlagen.filter((v) => v !== name);
+          favoriten = favoriten.filter((v) => v !== name);
+          zeichneVorlagen();
+          sicher(async () => {
+            await speichereEinstellung('vorlagen', vorlagen);
+            await speichereEinstellung('favoriten', favoriten);
+          });
+        });
+      } else {
+        stern.innerHTML = STERN;
+        stern.setAttribute('aria-pressed', istFavorit);
+        stern.setAttribute('aria-label', `${name} als Favorit ${istFavorit ? 'entfernen' : 'merken'}`);
+        stern.addEventListener('click', () => {
+          favoriten = schalteInListe(favoriten, name);
+          zeichneVorlagen();
+          sicher(() => speichereEinstellung('favoriten', favoriten));
+        });
+      }
       paar.append(b, stern);
       spontan.appendChild(paar);
     }
@@ -185,6 +213,8 @@ export function initMedikamente(speichern, melde) {
     zeichneSpontan();
     zeichneVorlagen();
     $('taeglich-neu').hidden = !bearbeiten;
+    $('vorlagen-hinweis').hidden = !bearbeiten;
+    if (bearbeiten) { $('spontan-neu').hidden = false; $('spontan-auf').setAttribute('aria-expanded', true); }
     $('medi-edit').textContent = bearbeiten ? 'Fertig' : 'Bearbeiten';
     $('medi-edit').classList.toggle('an', bearbeiten);
     $('medi-edit').setAttribute('aria-pressed', bearbeiten);
@@ -192,7 +222,7 @@ export function initMedikamente(speichern, melde) {
   }
 
   function trageSpontanEin(name) {
-    return setzeEinnahmen([...einnahmen(), { id: crypto.randomUUID(), medId: null, name, zeit: '', notiz: '', art: 'spontan' }]);
+    return setzeEinnahmen([...einnahmen(), { id: crypto.randomUUID(), medId: null, name, zeit: '', notiz: vorlagenNotizen[name] || '', art: 'spontan' }]);
   }
 
   $('medi-edit').addEventListener('click', () => { bearbeiten = !bearbeiten; zeichne(); });
@@ -257,6 +287,7 @@ export function initMedikamente(speichern, melde) {
         medikamente = await alle('medikamente');
         vorlagen = (await ladeEinstellung('vorlagen')) || [...STANDARD_VORLAGEN];
         favoriten = (await ladeEinstellung('favoriten')) || [];
+        vorlagenNotizen = (await ladeEinstellung('vorlagenNotizen')) || {};
       } catch (fehler) {
         console.error(fehler);
         melde('Medikamente konnten nicht geladen werden.', true);

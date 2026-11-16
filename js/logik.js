@@ -2,14 +2,15 @@
 
 export const TAGESZEITEN = ['morgens', 'mittags', 'abends', 'nachts'];
 
+// ohneStaerke: Schmerz vorhanden, Stärke unbekannt (aus Health übernommen).
 export function leererSchmerz() {
-  return { schmerzfrei: false, von: null, bis: null, tageszeiten: [], dauerStunden: null, orte: [] };
+  return { schmerzfrei: false, ohneStaerke: false, von: null, bis: null, tageszeiten: [], dauerStunden: null, orte: [] };
 }
 
 // Erster Tap setzt eine Stärke, zweiter Tap spannt eine Spanne auf,
 // derselbe Wert noch einmal löscht, ein Tap bei bestehender Spanne beginnt neu.
 export function waehleStaerke(s, n) {
-  const neu = { ...s, schmerzfrei: false };
+  const neu = { ...s, schmerzfrei: false, ohneStaerke: false };
   if (s.von === null || s.von !== s.bis) {
     neu.von = neu.bis = n;
   } else if (n === s.von) {
@@ -37,12 +38,12 @@ export function aendereDauer(stunden, schritt) {
 }
 
 export function istLeer(s) {
-  return !s.schmerzfrei && s.von === null && s.tageszeiten.length === 0 && s.dauerStunden === null && s.orte.length === 0;
+  return !s.schmerzfrei && !s.ohneStaerke && s.von === null && s.tageszeiten.length === 0 && s.dauerStunden === null && s.orte.length === 0;
 }
 
 export function staerkeText(s) {
   if (s.schmerzfrei) return '0';
-  if (s.von === null) return '–';
+  if (s.von === null) return s.ohneStaerke ? 'ja' : '–';
   return s.von === s.bis ? String(s.von) : `${s.von}–${s.bis}`;
 }
 

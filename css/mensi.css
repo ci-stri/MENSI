@@ -127,3 +127,110 @@ input.unterzeile { margin: -2px 0 4px 20px; width: calc(100% - 20px); font-size:
 .pillen .paar .stern { padding: 0 12px 0 6px; display: grid; place-items: center; flex: none; }
 .pillen .stern svg { width: 20px; height: 20px; fill: none; color: var(--tinte-weich); }
 .pillen .favorit .stern svg { fill: var(--beere); color: var(--beere); }
+.rosa .pillen button, .blau .pillen button { background: var(--weiss); }
+.rosa .pillen button.an, .blau .pillen button.an { background: var(--tinte); }
+.pillen button.entfernen { color: var(--beere); }
+
+/* Ansichten und schwebende Navigation */
+body { padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+.ansicht { display: flex; flex-direction: column; gap: 14px; }
+.kopf.einzeln { justify-content: center; min-height: 50px; }
+.leiste { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 10;
+  display: flex; gap: 2px; padding: 6px; border-radius: 999px; background: var(--tinte); box-shadow: 0 8px 24px rgba(22, 19, 15, .28);
+  width: min(398px, calc(100vw - 24px)); }
+.leiste button { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px 7px;
+  border-radius: 999px; color: var(--creme); font-size: 11px; font-weight: 600; min-height: 52px; }
+.leiste button svg { width: 22px; height: 22px; }
+.leiste button[aria-current="page"] { background: var(--creme); color: var(--tinte); }
+.leiste button:focus-visible { outline-color: var(--gelb); outline-offset: -3px; }
+.status { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 11; margin: 0;
+  min-height: 0; max-width: calc(100vw - 32px); padding: 8px 16px; border-radius: 999px; background: var(--tinte); color: var(--creme); font-size: 14px; }
+.status:empty { display: none; }
+
+/* Kleinteile */
+textarea { font: inherit; color: var(--tinte); background: var(--creme); border: 0; border-radius: 18px; padding: 12px 14px; width: 100%; resize: vertical; min-height: 88px; }
+textarea:focus-visible { outline: 3px solid var(--beere); outline-offset: 2px; }
+input[type="date"] { font: inherit; color: var(--tinte); background: var(--weiss); border: 0; border-radius: 14px; padding: 12px 14px; min-height: 44px; min-width: 0; }
+.breit.gross { padding-block: 18px; font-size: 17px; }
+.breit.rand { background: none; box-shadow: inset 0 0 0 2px var(--tinte); }
+.klein { font-size: 13px; color: var(--tinte-weich); margin: -6px 0 0; }
+.mitte-text { text-align: center; }
+.zeile.fein { font-size: 15px; padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent); }
+.zeile.fein .rechts { text-align: right; }
+.haupt.ruhig { cursor: default; }
+.rund.klein { width: 40px; height: 40px; background: var(--creme); font-size: 20px; }
+.rund.klein.an { background: var(--beere); color: var(--weiss); }
+.vorlage { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-top: 1px solid color-mix(in srgb, var(--tinte) 12%, transparent); }
+.vorlage .text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.vorlage input[type="text"] { background: var(--creme); }
+.pillen .paar .name { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.pillen .paar .name small { font-size: 12px; font-weight: 400; color: var(--tinte-weich); }
+.pillen .stern.loeschen { color: var(--beere); font-size: 22px; line-height: 1; }
+
+/* Kalender */
+.monat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.monat .wtag { text-align: center; font-size: 12px; color: var(--tinte-weich); padding-bottom: 2px; }
+.zelle { position: relative; aspect-ratio: 1 / 1.3; border-radius: 12px; background: var(--creme); display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding-top: 5px; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 0; }
+.zelle.heute { box-shadow: inset 0 0 0 2px var(--tinte); }
+.zelle.start::before { content: ""; position: absolute; left: 5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--tinte); }
+.b-schmier { background: #FCE9F3; }
+.b-unbekannt, .b-leicht { background: #F9CCE5; }
+.b-mittel { background: #F09AC9; }
+.b-stark { background: #D9559F; color: var(--weiss); }
+.zahl { font-size: 12px; font-weight: 700; line-height: 1; margin-top: 2px; }
+.zelle .punkt { position: absolute; right: 5px; top: 5px; }
+.punkt { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #5E7A1F; }
+.m-rot, .m-blau { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.m-rot { background: #D2342B; }
+.m-blau { background: #2F5FD0; }
+.zelle .medis { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: auto; padding: 0 3px 5px; }
+.b-stark .m-rot, .b-stark .m-blau { box-shadow: 0 0 0 1px var(--weiss); }
+.legende + .klein { margin-top: -6px; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--tinte-weich); align-items: center; }
+.legende span { display: inline-flex; align-items: center; gap: 5px; }
+.probe { display: inline-block; width: 14px; height: 14px; border-radius: 4px; }
+.legende .zahl { color: var(--tinte); margin: 0; }
+
+/* Druckseite (PDF): nur beim Drucken sichtbar, zur Kontrolle auch mit body.vorschau */
+#druck { display: none; }
+body.vorschau > *:not(#druck) { display: none !important; }
+body.vorschau #druck { display: block; width: 190mm; background: #fff; padding: 4mm; }
+#druck { color: #16130F; font: 7.6pt/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+#druck .d-kopf { display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm; border-bottom: 1.4pt solid #16130F; padding-bottom: 2.5mm; margin-bottom: 2mm; }
+#druck h1 { font-size: 15pt; font-weight: 600; margin: 0 0 1mm; letter-spacing: -.01em; }
+#druck .d-kopf p { margin: 0; font-size: 9pt; }
+#druck dl { display: flex; gap: 6mm; margin: 0; }
+#druck dt { font-size: 6.4pt; text-transform: uppercase; letter-spacing: .08em; color: #5B544A; }
+#druck dd { margin: 0; font-size: 10pt; font-weight: 600; white-space: nowrap; }
+#druck table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+#druck thead { display: table-header-group; }
+#druck th { text-align: left; font-size: 6.4pt; text-transform: uppercase; letter-spacing: .08em; color: #5B544A; font-weight: 600; padding: 1.2mm 1.2mm; border-bottom: .8pt solid #16130F; }
+#druck td { padding: .75mm 1.2mm; border-bottom: .3pt solid #D9D3C6; vertical-align: top; overflow-wrap: break-word; hyphens: auto; }
+#druck tr { break-inside: avoid; }
+#druck tr.woche td { border-top: 1pt solid #8C857A; }
+#druck tr.we .s-datum { color: #8C857A; }
+#druck tr.d-monat td { font-size: 9.5pt; font-weight: 600; padding: 3.2mm 1.2mm 1mm; border-bottom: .8pt solid #16130F; break-after: avoid; }
+#druck .s-datum { width: 17mm; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#druck .s-zt { width: 7mm; text-align: right; color: #5B544A; font-variant-numeric: tabular-nums; }
+#druck tr.start .s-zt { color: #16130F; font-weight: 700; }
+#druck .s-blutung { width: 19mm; }
+#druck .s-schmerz { width: 14mm; font-weight: 700; font-variant-numeric: tabular-nums; }
+#druck .s-wann { width: 22mm; }
+#druck .s-ort { width: 26mm; }
+#druck .s-med { width: 26mm; }
+#druck .s-sym { width: 28mm; }
+#druck td.b-schmier { background: #FCE9F3; }
+#druck td.b-unbekannt, #druck td.b-leicht { background: #F9CCE5; }
+#druck td.b-mittel { background: #F09AC9; }
+#druck td.b-stark { background: #D9559F; color: #fff; font-weight: 600; }
+#druck td.s-schmerz.hat { background: color-mix(in srgb, #F2B705 calc(var(--stufe, 3) * 9%), #fff); }
+#druck .d-fuss { margin: 3mm 0 0; font-size: 6.6pt; color: #5B544A; }
+#druck, #druck * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+@media print {
+  html, body { background: #fff !important; }
+  body { padding: 0 !important; }
+  body > *:not(#druck) { display: none !important; }
+  #druck { display: block; }
+}
+.pillen button small { display: block; font-size: 12px; font-weight: 400; color: var(--tinte-weich); text-align: left; }

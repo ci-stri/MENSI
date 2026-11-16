@@ -7,7 +7,7 @@ import {
 const SVG = 'http://www.w3.org/2000/svg';
 
 // Körperschaubild: eine Figur als Umriss, darin farbige Felder mit geschwungenen Grenzen.
-// Der Umriss schneidet die Felder zu. „rechts"/„links" meint die Körperseite der Person.
+// Der Umriss schneidet die Felder zu. Rechts und links meinen immer die Körperseite der Person.
 const KOPF = ['ellipse', { cx: 70, cy: 22, rx: 13, ry: 16 }];
 // Rechte Bildhälfte der Figur (Hals, Schulter, Arm mit Hand, Rumpf, Bein mit Fuß); gespiegelt ergibt sie die linke.
 const HAELFTE = 'M69.5,32 L76,32 L76,42 C76,47 84,49 94,51 C101,52 105,57 106,65 C108,82 110,98 112,114 '
@@ -26,19 +26,26 @@ function feld(y1, b1, y2, b2, x1 = 43, x2 = 97) {
   return ['path', { d: `M${x1},${y1} Q${m},${y1 + 2 * b1} ${x2},${y1} L${x2},${y2} Q${m},${y2 + 2 * b2} ${x1},${y2} Z` }];
 }
 const UNTERBAUCH = feld(112, 3, 147, 9);
+// Felder mit teil zeigen nur den Ausschnitt ihrer Grundform zwischen zwei x-Werten (rechts / Mitte / links).
+const paar = (id, name, farbe, basis, erst, zweit) => [
+  { id: `${id}-${erst}`, name: `${name} ${erst}`, farbe, basis, teil: [0, 70] },
+  { id: `${id}-${zweit}`, name: `${name} ${zweit}`, farbe, basis, teil: [70, 140] },
+];
 const REGIONEN = {
+  // Vorderansicht: die rechte Körperseite liegt im Bild links.
   vorne: [
     { id: 'kopf', name: 'Kopf', farbe: 'salbei', formen: [feld(0, 0, 44, 0)] },
     { id: 'brust', name: 'Brust', farbe: 'blau', formen: [feld(44, 0, 88, -5)] },
     { id: 'oberbauch', name: 'Oberbauch', farbe: 'gelb', formen: [feld(88, -5, 112, 3)] },
-    { id: 'unterbauch-rechts', name: 'Unterbauch rechts', farbe: 'rosa', teil: [0, 62] },
-    { id: 'unterbauch-mitte', name: 'Unterbauch Mitte', farbe: 'rosa-hell', teil: [62, 78] },
-    { id: 'unterbauch-links', name: 'Unterbauch links', farbe: 'rosa', teil: [78, 140] },
+    { id: 'unterbauch-rechts', name: 'Unterbauch rechts', farbe: 'rosa', basis: UNTERBAUCH, teil: [0, 62] },
+    { id: 'unterbauch-mitte', name: 'Unterbauch Mitte', farbe: 'rosa-hell', basis: UNTERBAUCH, teil: [62, 78] },
+    { id: 'unterbauch-links', name: 'Unterbauch links', farbe: 'rosa', basis: UNTERBAUCH, teil: [78, 140] },
     { id: 'leiste', name: 'Leiste / Becken', farbe: 'salbei', formen: [feld(147, 9, 168, 3, 38, 102)] },
-    { id: 'oberschenkel-vorne', name: 'Oberschenkel vorne', farbe: 'blau', formen: [feld(168, 3, 212, 0, 38, 102)] },
-    { id: 'knie', name: 'Knie', farbe: 'gelb', formen: [feld(212, 0, 234, 0, 38, 102)] },
-    { id: 'unterschenkel-vorne', name: 'Unterschenkel vorne', farbe: 'salbei', formen: [feld(234, 0, 281, 0, 38, 102)] },
+    ...paar('oberschenkel-vorne', 'Oberschenkel vorne', 'blau', feld(168, 3, 212, 0, 38, 102), 'rechts', 'links'),
+    ...paar('knie', 'Knie', 'gelb', feld(212, 0, 234, 0, 38, 102), 'rechts', 'links'),
+    ...paar('unterschenkel-vorne', 'Unterschenkel vorne', 'salbei', feld(234, 0, 281, 0, 38, 102), 'rechts', 'links'),
   ],
+  // Rückansicht: die linke Körperseite liegt im Bild links.
   hinten: [
     { id: 'nacken', name: 'Hinterkopf / Nacken', farbe: 'salbei', formen: [feld(0, 0, 48, 2)] },
     { id: 'ruecken-oben', name: 'Oberer Rücken', farbe: 'blau', formen: [feld(48, 2, 88, 3)] },
@@ -46,12 +53,18 @@ const REGIONEN = {
     { id: 'ruecken-unten', name: 'Unterer Rücken', farbe: 'rosa', formen: [feld(112, 3, 136, -3)] },
     { id: 'gesaess', name: 'Gesäß', farbe: 'salbei', formen: [feld(136, -3, 172, 4, 38, 102)] },
     { id: 'kreuzbein', name: 'Kreuzbein / Steiß', farbe: 'rosa-hell', formen: [['path', { d: 'M59,128 Q70,122 81,128 Q80,146 70,154 Q60,146 59,128 Z' }]] },
-    { id: 'oberschenkel-hinten', name: 'Oberschenkel hinten', farbe: 'blau', formen: [feld(172, 4, 214, 0, 38, 102)] },
-    { id: 'kniekehle', name: 'Kniekehle', farbe: 'gelb', formen: [feld(214, 0, 234, 0, 38, 102)] },
-    { id: 'wade', name: 'Wade', farbe: 'salbei', formen: [feld(234, 0, 281, 0, 38, 102)] },
+    ...paar('oberschenkel-hinten', 'Oberschenkel hinten', 'blau', feld(172, 4, 214, 0, 38, 102), 'links', 'rechts'),
+    ...paar('kniekehle', 'Kniekehle', 'gelb', feld(214, 0, 234, 0, 38, 102), 'links', 'rechts'),
+    ...paar('wade', 'Wade', 'salbei', feld(234, 0, 281, 0, 38, 102), 'links', 'rechts'),
   ],
 };
-const NAMEN = Object.fromEntries([...REGIONEN.vorne, ...REGIONEN.hinten].map((r) => [r.id, r.name]));
+// Namen für Anzeige und Export. Die letzten sechs stammen aus einer früheren Fassung ohne Seitenangabe.
+export const ORT_NAMEN = {
+  ...Object.fromEntries([...REGIONEN.vorne, ...REGIONEN.hinten].map((r) => [r.id, r.name])),
+  'oberschenkel-vorne': 'Oberschenkel vorne', knie: 'Knie', 'unterschenkel-vorne': 'Unterschenkel vorne',
+  'oberschenkel-hinten': 'Oberschenkel hinten', kniekehle: 'Kniekehle', wade: 'Wade',
+};
+const NAMEN = ORT_NAMEN;
 
 function form([tag, attribute], klasse) {
   const e = document.createElementNS(SVG, tag);
@@ -97,7 +110,7 @@ export function initSchmerz(speichern) {
         schnitt(`teil-${region.id}`, [['rect', { x: xa, y: 0, width: xb - xa, height: 300 }]]);
         const innen = document.createElementNS(SVG, 'g');
         innen.setAttribute('clip-path', `url(#teil-${region.id})`);
-        innen.appendChild(form(UNTERBAUCH, 'region'));
+        innen.appendChild(form(region.basis, 'region'));
         g.appendChild(innen);
       } else {
         region.formen.forEach((f) => g.appendChild(form(f, 'region')));

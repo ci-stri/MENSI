@@ -1,6 +1,6 @@
 // Offline-Betrieb: Netz zuerst (damit Updates sofort ankommen), sonst aus dem Zwischenspeicher.
 // Neue Dateien der App hier eintragen und VERSION erhöhen.
-const VERSION = 'mensi-6';
+const VERSION = 'mensi-12';
 const DATEIEN = [
   './',
   'index.html',
@@ -11,6 +11,17 @@ const DATEIEN = [
   'js/kalender.js',
   'js/features/schmerz.js',
   'js/features/medikamente.js',
+  'js/features/blutung.js',
+  'js/features/symptome.js',
+  'js/features/import.js',
+  'js/health.js',
+  'js/bericht.js',
+  'js/sicherung.js',
+  'js/teilen.js',
+  'js/features/extras.js',
+  'js/features/monat.js',
+  'js/features/medi-ansicht.js',
+  'js/features/export.js',
   'manifest.webmanifest',
   'icons/icon-180.png',
   'icons/icon-512.png',
